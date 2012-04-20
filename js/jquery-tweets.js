@@ -22,7 +22,8 @@
   Plugin.prototype = {
     defaults : {
       pollInterval     : 60,
-      hashTag          : "jsu",
+      hashTag          : false, //# lookup
+      mention          : false, //@ lookup
       resultType       : "recent",
       tweetsPerRequest : 50
     },
@@ -40,7 +41,7 @@
 
   Plugin.prototype.getTweets = function () {
     var self = this,
-      interval = self.config.pollInterval * 100;
+      interval = self.config.pollInterval * 1000;
 
     if (this.first) {
       //Flag First as Done
@@ -56,19 +57,34 @@
   Plugin.prototype.queryTwitterApi = function () {
     var self = this,
       config = self.config,
-      sinceId = self.maxId === 0 ? '' : "&since_id=" + self.maxId ;
+      sinceId = self.maxId === 0 ? '' : "&since_id=" + self.maxId,
+      url = "http://search.twitter.com/search.json?q=",
+      hashTag = self.config.hashTag,
+      mention = self.config.mention;
 
-    $.getJSON("http://search.twitter.com/search.json?q=" + config.hashTag +
-      " OR @" + config.hashTag +
-      "&result_type=" + config.resultType +
+    if (hashTag && mention) {
+      url += hashTag + " OR @" + mention;
+    } else if (hashTag) {
+      url += hashTag;
+    } else if (mention) {
+      url += "@" + mention;
+    } else {
+      self.returnError("No Hashtag Or Mention Option Set");
+      return false;
+    }
+
+    $.getJSON(url + "&result_type=" + config.resultType +
       "&rpp=" + config.tweetsPerRequest +
-      sinceId +
-      "&callback=?", {},
+      sinceId + "&callback=?", {},
       function (response) {
         //Set The Since ID
         self.setMaxId(response.max_id_str);
         self.handleResults(response.results.reverse());
       });
+  };
+
+  Plugin.prototype.returnError = function (error) {
+    this.$el.html("#Error - " + error)
   };
 
   Plugin.prototype.setMaxId = function (id) {
@@ -96,7 +112,7 @@
       postAuthorImg = tweet.profile_image_url,
       createdAt = tweet.created_at,
       //Set Up Base Element
-      tweetEl = $("<div class='tweet new'>");
+      tweetEl = $("<li class='tweet new'>");
 
     //@todo Replace Links
 
@@ -115,7 +131,7 @@
     //Prepend The Tweet To Container
     var self = this;
     this.$el.prepend(tweet);
-    $(tweet).fadeIn("slow", function() {
+    $(tweet).fadeIn("slow", function () {
       var self = $(this);
       setTimeout(function () {
         self.removeClass('new');

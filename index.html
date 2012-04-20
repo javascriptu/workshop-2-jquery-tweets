@@ -11,16 +11,24 @@
 
   <body>
     <div id="container">
-      <h1>tweetHash@</h1>
+
+      <h1>
+        <span>Tweets #</span>
+        <span class='right'>@ Mentions</span>
+      </h1>
       <ul id="tweets"></ul>
+      <ul id="mentions"></ul>
+
     </div>
 
 
     <script type="text/javascript">
-      var hashTag = "javascriptU";
+      var hashTag = "javascriptU",
+        mention = "javascriptU"
+
       $.fn.ready( function () {
         $("#tweets").tweetHash({hashTag : hashTag});
-
+        $("#mentions").tweetHash({mention : mention});
       });
 
     </script>

@@ -7,9 +7,17 @@ a { color : #666; text-decoration : none;  }
 
 a:hover { text-decoration : underline; }
 
-#container { width : 500px; margin : 0 auto; }
+#container { width : 960px; margin : 0 auto; }
 
-#tweets .tweet {
+span.right { float:right;}
+
+#tweets, #mentions {
+  width:400px;
+  display:inline-block;
+  vertical-align:top;
+}
+
+#tweets .tweet, #mentions .tweet {
   padding       : 10px 10px;
   font-size     : 14px;
   position      : relative;
@@ -17,8 +25,8 @@ a:hover { text-decoration : underline; }
   overflow      : hidden;
 }
 
-#tweets .tweet.new { background-color : #eee; }
+#tweets .tweet.new, #mentions .tweet.new { background-color : #e5e5e5; }
 
-#tweets .tweet img { margin-right : 10px; float : left; }
+#tweets .tweet img, #mentions .tweet img { margin-right : 10px; float : left; }
 
-#tweets .tweet .content { width : 450px; display : table-cell }
+#tweets .tweet .content, #mentions .tweet .content { width : 450px; display : table-cell }
