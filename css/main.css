@@ -1,0 +1,24 @@
+body {
+  font  : 12px/20px Arial, Helvetica, sans-serif;
+  color : #000;
+}
+
+a { color : #666; text-decoration : none;  }
+
+a:hover { text-decoration : underline; }
+
+#container { width : 500px; margin : 0 auto; }
+
+#tweets .tweet {
+  padding       : 10px 10px;
+  font-size     : 14px;
+  position      : relative;
+  border-bottom : 1px dashed #eee;
+  overflow      : hidden;
+}
+
+#tweets .tweet.new { background-color : #eee; }
+
+#tweets .tweet img { margin-right : 10px; float : left; }
+
+#tweets .tweet .content { width : 450px; display : table-cell }

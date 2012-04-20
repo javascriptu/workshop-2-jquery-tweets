@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>jQuery-Tweet</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <script src="js/jquery-1.7.min.js"></script>
+    <script src="js/jquery-tweets.js"></script>
+  </head>
+
+  <body>
+    <div id="container">
+      <h1>tweetHash@</h1>
+      <ul id="tweets"></ul>
+    </div>
+
+
+    <script type="text/javascript">
+      var hashTag = "javascriptU";
+      $.fn.ready( function () {
+        $("#tweets").tweetHash({hashTag : hashTag});
+
+      });
+
+    </script>
+
+
+  </body>
+</html>
