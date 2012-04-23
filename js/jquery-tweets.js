@@ -1,4 +1,4 @@
-/*jshint plusplus:false */
+/*jshint plusplus:false, lateDef:false */
 /*global jQuery, document, window, setInterval, setTimeout */
 
 /*
@@ -7,9 +7,10 @@
  */
 
 // ; - safety against script concatenation
-// window / document - small perf., helps min if referenced
+// window / document - small perf. improvement, helps min if referenced
 // undefined - mutable in ECMAScript 3 ensure undefined
 ;(function ($, window, document, undefined) {
+  "use strict";
 
   // plugin constructor
   var Plugin = function (el, options) {
@@ -25,122 +26,116 @@
       hashTag          : false, //# lookup
       mention          : false, //@ lookup
       resultType       : "recent",
-      tweetsPerRequest : 50
+      tweetsPerRequest : 10
     },
 
     init : function () {
       this.config = $.extend({}, this.defaults, this.options);
-      this.first = true;
+      this.initialLoad = true;
       this.tweets = [];
       this.maxId = 0;
       //Get Some Tweets
       this.getTweets();
       return this;
-    }
-  };
+    },
 
-  Plugin.prototype.getTweets = function () {
-    var self = this,
-      interval = self.config.pollInterval * 1000;
+    returnError : function(error) {
+      this.$el.html("#Error - " + error);
+    },
 
-    if (this.first) {
-      //Flag First as Done
-      this.first = false;
-      //Perform First Query To Twitter
-      this.queryTwitterApi();
-    }
-    setInterval(function () {
-      self.queryTwitterApi();
-    }, interval);
-  };
+    setMaxId : function (id) {
+      //Set The Max Id For Future Queries
+      this.maxId = id;
+    },
 
-  Plugin.prototype.queryTwitterApi = function () {
-    var self = this,
-      config = self.config,
-      sinceId = self.maxId === 0 ? '' : "&since_id=" + self.maxId,
-      url = "http://search.twitter.com/search.json?q=",
-      hashTag = self.config.hashTag,
-      mention = self.config.mention;
+    handleResults : function (tweets) {
+      var len = tweets.length,
+        i = 0;
+      //Loop through and add each
+      for (i; i < len; i++) {
+        this.tweets.push(tweets[i]);
+        //Add Tweet To Dom
+        this.buildTweet(tweets[i]);
+      }
+    },
 
-    if (hashTag && mention) {
-      url += hashTag + " OR @" + mention;
-    } else if (hashTag) {
-      url += hashTag;
-    } else if (mention) {
-      url += "@" + mention;
-    } else {
-      self.returnError("No Hashtag Or Mention Option Set");
-      return false;
-    }
+    getTweets : function () {
+      var self = this,
+        interval = self.config.pollInterval * 1000;
+      if (this.initialLoad) {
+        //Flag First as Done
+        this.initialLoad = false;
+        this.performApiSearch();
+      } else {
+        setInterval(function () {
+          self.performApiSearch();
+        }, interval);
+      }
+    },
 
-    $.getJSON(url + "&result_type=" + config.resultType +
-      "&rpp=" + config.tweetsPerRequest +
-      sinceId + "&callback=?", {},
-      function (response) {
+    performApiSearch : function () {
+      var self = this,
+        url = this.constructTwitterApiUrl();
+
+      var tweets = $.ajax({
+        url      : url,
+        dataType : "jsonp"
+      });
+
+      tweets.done(function (response) {
         //Set The Since ID
         self.setMaxId(response.max_id_str);
         self.handleResults(response.results.reverse());
       });
-  };
+    },
 
-  Plugin.prototype.returnError = function (error) {
-    this.$el.html("#Error - " + error)
-  };
+    constructTwitterApiUrl : function() {
+      var config = this.config,
+        url = "http://search.twitter.com/search.json?q=",
+        sinceId = this.maxId === 0 ? '' : "&since_id=" + this.maxId,
+        hashTag = this.config.hashTag,
+        mention = this.config.mention;
 
-  Plugin.prototype.setMaxId = function (id) {
-    //Set The Max Id For Future Queries
-    this.maxId = id;
-  };
+      if (!hashTag && !mention) {
+        this.returnError("No Hashtag Or Mention Option Set");
+        return false;
+      }
 
-  Plugin.prototype.handleResults = function (tweets) {
-    var len = tweets.length,
-      i = 0;
+      if (hashTag && mention) url += hashTag + " OR @" + mention;
+      else if (hashTag) url += hashTag;
+      else if (mention)  url += "@" + mention;
 
-    //Loop through and add each
-    for (i; i < len; i++) {
-      this.tweets.push(tweets[i]);
-      //Add Tweet To Dom
-      this.buildTweet(tweets[i]);
+      return url + "&result_type=" + config.resultType + "&rpp=" + config.tweetsPerRequest + sinceId;
+    },
+
+    buildTweet : function (tweet) {
+      var tweetText = tweet.text,
+        idStr = tweet.id_str,
+        postAuthor = tweet.from_user,
+        postAuthorImg = tweet.profile_image_url,
+        createdAt = tweet.created_at,
+        strEl = "<li class='tweet new'>" +
+                         "<a href='http://www.twitter.com/" + postAuthor + "' target='_blank'>"+
+                            "<img src='" + postAuthorImg + "' width='48' height='48' />" +
+                         "</a>" +
+                         "<div class='content'>" + tweetText + "</br>" +
+                            "<a href='http://www.twitter.com/" + postAuthor + "/status/" + idStr + "' class='view' target='_blank'>" + createdAt + "</a>" +
+                         "</div>" +
+                       "</li>";
+      //Call The Add Method
+      this.add(strEl);
+    },
+
+    add : function (tweet) {
+      var $tweet = $(tweet);
+      //Prepend The Tweet To Container
+      this.$el.prepend($tweet);
+      //Fade In Tweet
+      $tweet.fadeIn("slow", function () {
+          $(this).delay("1000").removeClass('new');
+      });
     }
   };
-
-  Plugin.prototype.buildTweet = function (tweet) {
-    var tweetText = tweet.text,
-      idStr = tweet.id_str,
-      postAuthor = tweet.from_user,
-      postAuthorId = tweet.from_user_id,
-      postAuthorImg = tweet.profile_image_url,
-      createdAt = tweet.created_at,
-      //Set Up Base Element
-      tweetEl = $("<li class='tweet new'>");
-
-    //@todo Replace Links
-
-    //Build the HTML Tweet String
-    var htmlString = "<a href='http://www.twitter.com/'" + postAuthor + " target='_blank'><img src='" + postAuthorImg + "' width='48' height='48' /></a>";
-    htmlString += "<div class='content'>" + tweetText + "</br>";
-    htmlString += "<a href='http://www.twitter.com/" + postAuthor + "/status/" + idStr + "' class='view' target='_blank'>" + createdAt + "</a>";
-    htmlString += "</div>";
-    tweetEl.html(htmlString);
-
-    //Call The Add Method
-    this.add(tweetEl);
-  };
-
-  Plugin.prototype.add = function (tweet) {
-    //Prepend The Tweet To Container
-    var self = this;
-    this.$el.prepend(tweet);
-    $(tweet).fadeIn("slow", function () {
-      var self = $(this);
-      setTimeout(function () {
-        self.removeClass('new');
-      }, 500);
-    });
-  };
-
-  //Set The Public Plugin Defaults
-  Plugin.defaults = Plugin.prototype.defaults;
 
   $.fn.tweetHash = function (options) {
     return this.each(function () {

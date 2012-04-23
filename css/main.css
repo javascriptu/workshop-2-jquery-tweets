@@ -3,18 +3,38 @@ body {
   color : #000;
 }
 
-a { color : #666; text-decoration : none;  }
+a { color : #666; text-decoration : none; }
 
 a:hover { text-decoration : underline; }
 
-#container { width : 960px; margin : 0 auto; }
+#container {
+  width  : 730px;
+  margin : 0 auto;
+}
 
-span.right { float:right;}
+#container h1 {
+  width : 710px;
+}
+
+.module {
+  float                 : left;
+  margin-right          : 10px;
+  background-color      : #eee;
+  -moz-border-radius    : 10px;
+  -webkit-border-radius : 10px;
+  border-radius         : 10px;
+}
+
+span.right { float : right; }
 
 #tweets, #mentions {
-  width:400px;
-  display:inline-block;
-  vertical-align:top;
+  width          : 350px;
+  display        : inline-block;
+  vertical-align : top;
+  margin         : 0;
+  padding        : 0;
+  max-height     : 400px;
+  overflow       : auto;
 }
 
 #tweets .tweet, #mentions .tweet {
@@ -22,11 +42,20 @@ span.right { float:right;}
   font-size     : 14px;
   position      : relative;
   border-bottom : 1px dashed #eee;
-  overflow      : hidden;
+  display: none;
 }
 
-#tweets .tweet.new, #mentions .tweet.new { background-color : #e5e5e5; }
+#tweets .tweet.new, #mentions .tweet.new {
+  background-color : #e5e5e5;
+}
 
-#tweets .tweet img, #mentions .tweet img { margin-right : 10px; float : left; }
+#tweets .tweet img, #mentions .tweet img {
+  margin-right : 10px;
+  float        : left;
+}
 
-#tweets .tweet .content, #mentions .tweet .content { width : 450px; display : table-cell }
+#tweets .tweet .content, #mentions .tweet .content {
+  width   : 450px;
+  display : table-cell;
+}
+

@@ -5,22 +5,31 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>jQuery-Tweet</title>
     <link rel="stylesheet" type="text/css" href="css/main.css"/>
-    <script src="js/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      if (typeof jQuery === 'undefined') {
+        //If jQuery CDN Fails Load Locally
+        document.write("<script src=\"js/jquery-1.7.min.js\"> <\/script>");
+      }
+    </script>
     <script src="js/jquery-tweets.js"></script>
   </head>
 
   <body>
     <div id="container">
-
       <h1>
         <span>Tweets #</span>
         <span class='right'>@ Mentions</span>
       </h1>
-      <ul id="tweets"></ul>
-      <ul id="mentions"></ul>
 
+      <div class='module'>
+        <ul id="tweets"></ul>
+      </div>
+
+      <div class='module'>
+        <ul id="mentions"></ul>
+      </div>
     </div>
-
 
     <script type="text/javascript">
       var hashTag = "javascriptU",
@@ -32,7 +41,6 @@
       });
 
     </script>
-
 
   </body>
 </html>
