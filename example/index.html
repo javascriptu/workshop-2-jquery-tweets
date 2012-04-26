@@ -5,14 +5,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>jQuery-Tweet</title>
     <link rel="stylesheet" type="text/css" href="css/main.css"/>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript">
       if (typeof jQuery === 'undefined') {
         //If jQuery CDN Fails Load Locally
-        document.write("<script src=\"js/jquery-1.7.min.js\"> <\/script>");
+        document.write("<script src=\"vendor/jquery-1.7.min.js\"> <\/script>");
       }
     </script>
-    <script src="js/jquery-tweets.js"></script>
+    <script src="../src/jquery-tweets.js"></script>
   </head>
 
   <body>
@@ -32,15 +32,13 @@
     </div>
 
     <script type="text/javascript">
-      var hashTag = "javascriptU",
-        mention = "javascriptU"
+      var hashTag = "jquery",
+        mention = "jquery"
 
       $.fn.ready( function () {
         $("#tweets").tweetHash({hashTag : hashTag});
         $("#mentions").tweetHash({mention : mention});
       });
-
     </script>
-
   </body>
 </html>
